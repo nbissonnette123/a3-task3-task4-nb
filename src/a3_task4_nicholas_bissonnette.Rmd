@@ -1,0 +1,81 @@
+---
+title: "a3_task4_nicholas_bissonnette"
+author: "Nichoals Bissonnette"
+date: "11/4/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message= FALSE, warning= FALSE)
+library(tidyverse)
+library(here)
+library(janitor)
+library(kableExtra)
+library(lubridate)
+```
+
+#### Task 4 
+
+Step 3. I will read in the urchins data in the first code chunk, I will clean the dates and create new column titles as well for month and year. 
+```{r}
+urchins <- read.csv(here("data", "urchins.csv")) %>% 
+  clean_names()
+
+urchins_clean <-urchins %>% 
+  mutate(Date=mdy(date)) %>% 
+  mutate(month = month(Date)) %>% 
+  mutate(year= year(Date))
+
+
+```
+
+a. Now I will wrangle the data to only include Naples Reef observations for purple urchins observed in January 2010 using the filter().
+
+```{r}
+purple_jan_10 <- urchins_clean %>% 
+  filter(common_name == "Purple Urchin", year == 2010, month == 1, site== "NAPL")
+```
+
+b. Now I will make histograms to explore the size distribution for each of the treatments. 
+
+```{r}
+ggplot(data= purple_jan_10, aes(x= size)) +
+  geom_histogram(bins=15)+
+  facet_wrap(~treatment)
+```
+In the next chunk I will create a quantile-quantile plot to assess normality. 
+
+```{r}
+ggplot(data= purple_jan_10, aes(sample= size)) +
+  geom_qq()+
+  facet_wrap(~treatment)
+```
+
+The above qqplot shows a linear relationship in the distribution indicating normality. The histograms show a slightly negative skew for the annual treatment group, but overall both distributions show normality.  
+
+C. Now I will create a table of summary statistics including mean, standard deviation, median and sample size.
+```{r}
+purple_stats<- purple_jan_10 %>% 
+  group_by(treatment) %>% 
+  summarize(mean_size = mean(size),
+            sd_size = sd(size),
+            median_size= median(size),
+            n= n())
+purple_stats %>% 
+  kbl() %>% 
+  kable_styling()
+```
+
+d. Now I will preform a two-sample t-test to compare means between two groups. 
+```{r}
+annual_sample <- purple_jan_10%>% 
+  filter(treatment== "ANNUAL") %>% 
+pull(size)
+
+control_sample <- purple_jan_10 %>% 
+  filter(treatment== "CONTROL") %>% 
+  pull(size)
+
+t.test(x= annual_sample, control_sample)
+```
+e-f. The T-test shows that the annual treatment group has a higher mean value of 3.92  then the control group which is 3.73. The numerical difference in means is  3.92- 3.37 = 0.55. For the collected samples the annual treatment urchins have a larger size of 0.55 cm. The p-value tells us there is about a 25% chance that both of these samples came from populations with the same mean. 

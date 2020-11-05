@@ -5,7 +5,7 @@ date: "11/3/2020"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=TRUE, warning = FALSE, message = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
@@ -15,7 +15,7 @@ library(lubridate)
 ```
 
 #### Section 1
-Read in the urchins data  to compare distribution sizes. 
+Read in the urchins data  to compare distribution sizes using read_csv() and here(). I will also use the clean_names() to get all column names in lowercase.  
 
 ```{r}
 urchins <- read_csv(here("data", "urchins.csv")) %>% 
@@ -23,7 +23,7 @@ urchins <- read_csv(here("data", "urchins.csv")) %>%
 
 ```
 
-In this code chunk I will create a histogram of the sizes of both red and purple urchins.
+In this code chunk I will create histograms of the sizes of both red and purple urchins to explore distribution. 
 
 ```{r}
 ggplot(data= urchins, aes(x= size)) +
@@ -34,7 +34,7 @@ ggplot(data= urchins, aes(x= size)) +
 
 ```
 
-In this code chunk I will create a box plot.
+In this code chunk I will create a box plot to display the distribution of my continuous variable. The boxplot will display the median, two hinges and two whiskers and all outlyers in the data as points at the top or bottom. 
 
 ```{r}
 ggplot(data= urchins, aes(x= common_name, y= size)) +
@@ -61,14 +61,14 @@ summary_stats %>%
 iii. After looking at the exploratory data and tables, I observe that the both purple and red urchins have a normal distribution and the purple urchin has smaller data spread when compared to red. The difference between the purple urchin median and mean values is about %5 while the difference in red median and mean values are about %3. 
 
 #### Section 2
-
+Now I will make a new column with dates in a mdy format and under the "date" class. 
 ```{r}
 urchins_clean <-urchins %>% 
   mutate(date=mdy(date))
 class(urchins_clean$date)
 ```
 
-i. I will now create a new subset of data containing only purple urchins data points. Also I will convert the date data to the "Date" class, also creating a new column that only contains the year. Lastly I will create a new column that only has full site name. But I also need to clean the dates to get them in the proper format. 
+i. I will now create a new subset of data containing only purple urchins data points. Also I will convert the date data to the "Date" class, also creating a new column that only contains the year. Lastly I will create a new column that only has full site name. 
 ```{r}
 
 
